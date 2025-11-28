@@ -24,3 +24,8 @@ Thumbs.db
 *.zip
 MASTER.txt
 ACFTREF.txt
+
+# AI artifacts
+.openAI/
+.cursor/
+.claude/

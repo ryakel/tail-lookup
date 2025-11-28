@@ -1,4 +1,4 @@
-name: Build on Code Change
+name: Build - Main
 
 on:
   push:
