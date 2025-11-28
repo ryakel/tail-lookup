@@ -43,11 +43,11 @@ jobs:
           mkdir -p data
           # Get latest release with aircraft.db
           DOWNLOAD_URL=$(curl -s https://api.github.com/repos/ryakel/tail-lookup/releases/latest \
-            | jq -r '.assets[] | select(.name == "aircraft.db") | .browser_download_url')
+            | jq -r '.assets[]? | select(.name == "aircraft.db") | .browser_download_url' 2>/dev/null || echo "")
 
           if [ -z "$DOWNLOAD_URL" ] || [ "$DOWNLOAD_URL" = "null" ]; then
             echo "No existing database found, building fresh..."
-            pip install -q requests
+            pip install -q requests httpx
             python scripts/update_faa_data.py data/aircraft.db
           else
             echo "Downloading from $DOWNLOAD_URL"
