@@ -1,0 +1,26 @@
+# Database
+*.db
+data/*
+!data/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# FAA downloads
+*.zip
+MASTER.txt
+ACFTREF.txt
