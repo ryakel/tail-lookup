@@ -1,0 +1,211 @@
+name: Security Vulnerability Report
+description: Report a security vulnerability (private disclosure recommended)
+title: "[Security]: "
+labels: ["security", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ⚠️ Important Security Notice
+
+        If you've discovered a **critical security vulnerability**, please consider reporting it privately first:
+
+        1. **Email**: Contact the maintainer directly (check repository for contact info)
+        2. **GitHub Security Advisories**: Use GitHub's private reporting feature
+        3. **This Form**: Only for non-critical security concerns that don't expose active vulnerabilities
+
+        ### When to Report Privately:
+        - Authentication/authorization bypasses
+        - SQL injection, XSS, or other injection vulnerabilities
+        - Remote code execution vulnerabilities
+        - Exposure of sensitive data
+        - Any issue that could be actively exploited
+
+        ### When This Form is Appropriate:
+        - Security best practice recommendations
+        - Configuration improvements
+        - Dependency updates with known CVEs
+        - General security hardening suggestions
+
+        ---
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity Level
+      description: How severe is this security concern?
+      options:
+        - Critical - Active exploit possible, immediate action required
+        - High - Significant security risk
+        - Medium - Security concern with limited impact
+        - Low - Security best practice improvement
+        - Informational - General security recommendation
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ### ⚠️ STOP: If you selected "Critical" or "High" severity
+
+        Please **DO NOT continue with this public form**. Instead:
+        1. Email the maintainer directly (check CODE_OF_CONDUCT.md or SECURITY.md)
+        2. Use GitHub Security Advisories for private disclosure
+        3. Wait for acknowledgment before public disclosure
+
+        **Responsible disclosure protects all users.**
+
+        ---
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Security Category
+      description: What type of security concern is this?
+      options:
+        - Dependency vulnerability
+        - Configuration issue
+        - Data exposure
+        - Authentication/Authorization
+        - Input validation
+        - Cryptography
+        - Network security
+        - Container/Docker security
+        - Best practices
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Security Concern Description
+      description: Describe the security concern (avoid exploit details for high-severity issues)
+      placeholder: |
+        Example: The application uses an outdated version of Chart.js (v2.9.4) which has a known XSS vulnerability (CVE-XXXX-XXXXX).
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Potential Impact
+      description: What could happen if this vulnerability is exploited?
+      placeholder: |
+        Example: An attacker could inject malicious JavaScript that executes in the context of other users' browsers.
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected-components
+    attributes:
+      label: Affected Components
+      description: Which parts of the application are affected?
+      placeholder: |
+        Example:
+        - app/js/app.js (budget chart rendering)
+        - Dependencies: chart.js v2.9.4
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: Affected Deployment Methods
+      description: Which deployment methods are affected?
+      multiple: true
+      options:
+        - Browser (local HTML file)
+        - Docker deployment
+        - All deployment methods
+        - Unknown
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce (if safe to share)
+      description: Only include reproduction steps if they don't enable exploitation
+      placeholder: |
+        1. Open browser DevTools
+        2. Check Console for CSP violations
+        3. Note missing security headers
+
+  - type: textarea
+    id: recommendation
+    attributes:
+      label: Recommended Fix
+      description: What do you recommend to fix this issue?
+      placeholder: |
+        Example:
+        1. Update chart.js to v3.x or later
+        2. Run: npm update chart.js
+        3. Test chart rendering after upgrade
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: CVE numbers, security advisories, or documentation links
+      placeholder: |
+        - CVE-2020-XXXXX
+        - https://nvd.nist.gov/vuln/detail/CVE-2020-XXXXX
+        - https://github.com/chartjs/Chart.js/security/advisories/GHSA-xxxx
+
+  - type: textarea
+    id: cve-score
+    attributes:
+      label: CVSS Score (if applicable)
+      description: If there's a CVE, provide the CVSS score and vector
+      placeholder: |
+        CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N (6.1 Medium)
+
+  - type: checkboxes
+    id: disclosure
+    attributes:
+      label: Responsible Disclosure Agreement
+      options:
+        - label: I understand this report may be publicly visible
+          required: true
+        - label: I have NOT included active exploit code or detailed attack vectors
+          required: true
+        - label: I will allow reasonable time for patching before public disclosure
+          required: true
+        - label: I agree to follow this project's Security Policy and Code of Conduct
+          required: true
+
+  - type: textarea
+    id: contact
+    attributes:
+      label: Contact Information (optional)
+      description: How can we reach you for follow-up questions? (Email, GitHub username, etc.)
+      placeholder: |
+        GitHub: @yourusername
+        Email: your.email@example.com (for private follow-up)
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### What happens next?
+
+        1. **Triage**: Your report will be reviewed within 48-72 hours
+        2. **Acknowledgment**: You'll receive confirmation of receipt
+        3. **Investigation**: We'll investigate and validate the concern
+        4. **Fix Development**: A patch will be developed and tested
+        5. **Disclosure**: Once patched, a security advisory may be published
+        6. **Credit**: You may be credited in the security advisory (if desired)
+
+        ### Security Best Practices
+
+        - **Never** share exploit code publicly
+        - **Always** give maintainers time to patch (30-90 days typical)
+        - **Consider** encrypted communication for sensitive details
+        - **Follow** responsible disclosure guidelines
+
+        ### Questions?
+
+        Check our [SECURITY.md](https://github.com/ryakel/flight-budget/blob/main/SECURITY.md) for our security policy and contact information.
+
+        **Thank you for helping keep Flight Budget Calculator secure!** 🛡️

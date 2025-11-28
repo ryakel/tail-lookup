@@ -1,0 +1,101 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for Flight Budget Calculator
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest a new feature! Please fill out the information below to help us understand your request.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Use Case
+      description: Describe the problem this feature would solve or the use case it addresses
+      placeholder: |
+        Example: As a flight student, I want to compare training costs between different aircraft so I can make informed decisions about which aircraft to train in.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe how you envision this feature working
+      placeholder: |
+        Example: Add a "Compare Aircraft" view that shows side-by-side cost breakdowns for multiple aircraft selections.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Have you considered any alternative solutions or workarounds?
+      placeholder: |
+        Example: Currently I export to PDF and manually compare, but this is time-consuming.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Critical - Blocking my workflow
+        - High - Would significantly improve my experience
+        - Medium - Nice to have
+        - Low - Minor improvement
+    validations:
+      required: true
+
+  - type: dropdown
+    id: user-type
+    attributes:
+      label: User Type
+      description: Which best describes you?
+      options:
+        - Flight Student
+        - CFI/Flight Instructor
+        - Flight School Administrator
+        - Hobbyist Pilot
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: Benefits
+      description: Who would benefit from this feature and how?
+      placeholder: |
+        Example: Flight students could save time and money by easily comparing aircraft options. Flight schools could better market their fleet.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or examples about the feature request
+      placeholder: Drag and drop screenshots, mockups, or other relevant files here
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this feature request, you agree to follow our Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### What happens next?
+
+        1. Your feature request will be reviewed by maintainers
+        2. Community members can vote with 👍 on the issue
+        3. Popular requests are prioritized for development
+        4. You'll be notified of any updates or questions
+
+        **Want to contribute?** Check our [Contributing Guide](https://github.com/ryakel/flight-budget/wiki/Contributing) to implement this feature yourself!

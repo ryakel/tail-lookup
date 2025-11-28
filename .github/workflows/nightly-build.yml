@@ -1,0 +1,107 @@
+name: Nightly Build
+
+on:
+  schedule:
+    # Run daily at 6:00 AM UTC (after FAA's 11:30 PM CT update)
+    - cron: '0 6 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ryakel/tail-lookup
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download and build database
+        run: |
+          python scripts/update_faa_data.py data/aircraft.db
+
+      - name: Get build info
+        id: info
+        run: |
+          RECORDS=$(sqlite3 data/aircraft.db "SELECT COUNT(*) FROM master")
+          SIZE=$(du -h data/aircraft.db | cut -f1)
+          DATE=$(date -u +%Y-%m-%d)
+          echo "records=$RECORDS" >> $GITHUB_OUTPUT
+          echo "size=$SIZE" >> $GITHUB_OUTPUT
+          echo "date=$DATE" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ steps.info.outputs.date }}
+          labels: |
+            org.opencontainers.image.title=tail-lookup
+            org.opencontainers.image.description=FAA Aircraft Registration Lookup API
+            org.opencontainers.image.created=${{ steps.info.outputs.date }}
+            org.opencontainers.image.source=https://github.com/ryakel/tail-lookup
+            faa.data.records=${{ steps.info.outputs.records }}
+            faa.data.date=${{ steps.info.outputs.date }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: data-${{ steps.info.outputs.date }}
+          name: "FAA Data - ${{ steps.info.outputs.date }}"
+          body: |
+            ## FAA Aircraft Registration Database
+            
+            **Date:** ${{ steps.info.outputs.date }}
+            **Records:** ${{ steps.info.outputs.records }}
+            **DB Size:** ${{ steps.info.outputs.size }}
+            
+            **Docker Image:**
+            ```
+            docker pull ryakel/tail-lookup:${{ steps.info.outputs.date }}
+            docker pull ryakel/tail-lookup:latest
+            ```
+            
+            Source: [FAA Releasable Aircraft Database](https://www.faa.gov/licenses_certificates/aircraft_certification/aircraft_registry/releasable_aircraft_download)
+          files: data/aircraft.db
+          prerelease: false
+
+      - name: Trigger Portainer webhook
+        if: ${{ secrets.PORTAINER_WEBHOOK_URL != '' }}
+        run: |
+          curl -X POST "${{ secrets.PORTAINER_WEBHOOK_URL }}" || true
+
+      - name: Summary
+        run: |
+          echo "## Build Complete 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Date | ${{ steps.info.outputs.date }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Records | ${{ steps.info.outputs.records }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| DB Size | ${{ steps.info.outputs.size }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Image | \`${{ env.IMAGE_NAME }}:${{ steps.info.outputs.date }}\` |" >> $GITHUB_STEP_SUMMARY

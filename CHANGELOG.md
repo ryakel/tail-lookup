@@ -27,6 +27,23 @@ All notable changes to tail-lookup will be documented in this file.
   - `.gitignore` - Excludes database files, Python cache, IDE files
   - `.dockerignore` - Optimizes Docker build context
   - `requirements.txt` - FastAPI, Uvicorn, Pydantic, httpx
+- Docker support:
+  - `Dockerfile` - Python 3.12-slim with baked-in database
+  - `docker-compose.yml` - Simple deployment configuration
+- GitHub Actions CI/CD:
+  - `.github/workflows/nightly-build.yml` - Daily automated database updates at 6 AM UTC
+  - `.github/workflows/build.yml` - Rebuild on code changes
+  - Automatic Docker Hub publication
+  - GitHub Releases for database snapshots
+- Documentation:
+  - `README.md` - Project documentation with examples
+  - `CHANGELOG.md` - Version history tracking
+  - `.github/SESSION_NOTES.md` - Development progress tracking
+- GitHub repository templates:
+  - `.github/ISSUE_TEMPLATE/` - Bug report and feature request templates
+  - `.github/PULL_REQUEST_TEMPLATE.md` - PR template
+  - `.github/CODEOWNERS` - Code ownership configuration
+  - `renovate.json` - Automated dependency updates
 
 ### Technical Details
 - Python 3.12 with FastAPI framework
