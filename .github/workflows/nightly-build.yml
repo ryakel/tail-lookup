@@ -90,10 +90,14 @@ jobs:
           files: data/aircraft.db
           prerelease: false
 
-      - name: Trigger Portainer webhook
-        if: ${{ secrets.PORTAINER_WEBHOOK_URL != '' }}
+      - name: Trigger Portainer webhook (optional)
+        continue-on-error: true
+        env:
+          WEBHOOK_URL: ${{ secrets.PORTAINER_WEBHOOK_URL }}
         run: |
-          curl -X POST "${{ secrets.PORTAINER_WEBHOOK_URL }}" || true
+          if [ -n "$WEBHOOK_URL" ]; then
+            curl -X POST "$WEBHOOK_URL"
+          fi
 
       - name: Summary
         run: |
