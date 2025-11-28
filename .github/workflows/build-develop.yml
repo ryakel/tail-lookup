@@ -67,16 +67,14 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=develop
-            type=sha,prefix=develop-
 
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: |
-            ${{ env.IMAGE_NAME }}:develop
-            ${{ env.IMAGE_NAME }}:develop-${{ github.sha }}
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          tags: ${{ env.IMAGE_NAME }}:develop
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -99,4 +97,3 @@ jobs:
           echo "| Branch | develop |" >> $GITHUB_STEP_SUMMARY
           echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Image | \`${{ env.IMAGE_NAME }}:develop\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Tagged | \`${{ env.IMAGE_NAME }}:develop-${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
