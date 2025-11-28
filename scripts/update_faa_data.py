@@ -80,11 +80,11 @@ def parse_csv(zf: zipfile.ZipFile, filename: str, expected_cols: list) -> list[d
     """Parse a CSV file from the ZIP archive."""
     print(f"Parsing {filename}...")
     with zf.open(filename) as f:
-        # FAA files are UTF-8 with some Latin-1 characters
-        text = io.TextIOWrapper(f, encoding="utf-8", errors="replace")
+        # FAA files are UTF-8 with BOM (Byte Order Mark)
+        text = io.TextIOWrapper(f, encoding="utf-8-sig", errors="replace")
         reader = csv.reader(text)
         header = [col.strip() for col in next(reader)]
-        
+
         # Map expected columns to actual positions
         col_map = {}
         for col in expected_cols:
