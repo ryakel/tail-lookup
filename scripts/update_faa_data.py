@@ -4,7 +4,7 @@ Download FAA aircraft registration data and build SQLite database.
 
 Usage:
     python update_faa_data.py [output_path]
-    
+
 Default output: ./aircraft.db
 """
 import csv
@@ -12,9 +12,15 @@ import io
 import os
 import sqlite3
 import sys
+import time
 import zipfile
 from datetime import datetime, timezone
-from urllib.request import urlopen
+
+try:
+    import requests
+except ImportError:
+    print("Error: requests library not installed. Run: pip install requests")
+    sys.exit(1)
 
 FAA_URL = "https://registry.faa.gov/database/ReleasableAircraft.zip"
 
@@ -35,12 +41,39 @@ ACFTREF_COLS = ["CODE", "MFR", "MODEL", "TYPE-ACFT", "TYPE-ENG", "AC-CAT",
 
 
 def download_faa_data() -> zipfile.ZipFile:
-    """Download FAA database ZIP file."""
+    """Download FAA database ZIP file with retries."""
     print(f"Downloading {FAA_URL}...")
-    with urlopen(FAA_URL, timeout=120) as resp:
-        data = resp.read()
-    print(f"Downloaded {len(data) / 1e6:.1f} MB")
-    return zipfile.ZipFile(io.BytesIO(data))
+
+    max_retries = 3
+    timeout = 300  # 5 minutes
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = requests.get(
+                FAA_URL,
+                timeout=timeout,
+                stream=True,
+                headers={'User-Agent': 'tail-lookup-builder/1.0'}
+            )
+            response.raise_for_status()
+
+            # Download with progress
+            data = bytearray()
+            for chunk in response.iter_content(chunk_size=8192):
+                data.extend(chunk)
+
+            print(f"Downloaded {len(data) / 1e6:.1f} MB")
+            return zipfile.ZipFile(io.BytesIO(data))
+
+        except (requests.exceptions.Timeout, requests.exceptions.RequestException) as e:
+            if attempt < max_retries:
+                wait_time = attempt * 10  # Exponential backoff: 10s, 20s, 30s
+                print(f"Download failed (attempt {attempt}/{max_retries}): {e}")
+                print(f"Retrying in {wait_time} seconds...")
+                time.sleep(wait_time)
+            else:
+                print(f"Download failed after {max_retries} attempts")
+                raise
 
 
 def parse_csv(zf: zipfile.ZipFile, filename: str, expected_cols: list) -> list[dict]:
