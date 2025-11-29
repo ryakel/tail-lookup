@@ -15,6 +15,8 @@
 
 **🔧 Development**
 - [Development Guide](Development-Guide)
+- [Release Process](Release-Process)
+- [Changelog](Changelog)
 
 ---
 
