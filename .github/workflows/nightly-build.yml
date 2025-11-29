@@ -27,6 +27,10 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install Python dependencies
+        run: |
+          pip install requests
+
       - name: Download and build database
         run: |
           python scripts/update_faa_data.py data/aircraft.db
