@@ -30,35 +30,50 @@ env:
   IMAGE_NAME: ryakel/tail-lookup
 
 jobs:
-  build:
-    name: Docker Build and Push (Develop)
+  # Build database once and share across all platform builds
+  build-database:
+    name: Build Database
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download latest database from releases
+      - name: Build database
         run: |
           mkdir -p data
-          # Get latest release with aircraft.db
-          DOWNLOAD_URL=$(curl -s https://api.github.com/repos/ryakel/tail-lookup/releases/latest \
-            | jq -r '.assets[] | select(.name == "aircraft.db") | .browser_download_url')
+          echo "Building fresh database for develop branch..."
+          pip install -q requests httpx
+          python scripts/update_faa_data.py data/aircraft.db
 
-          if [ -z "$DOWNLOAD_URL" ] || [ "$DOWNLOAD_URL" = "null" ]; then
-            echo "No existing database found, building fresh..."
-            pip install -q requests
-            python scripts/update_faa_data.py data/aircraft.db
-          else
-            echo "Downloading from $DOWNLOAD_URL"
-            curl -L -o data/aircraft.db "$DOWNLOAD_URL"
-          fi
-
-      - name: Purge Build Cache
-        uses: MyAlbum/purge-cache@v2
+      - name: Upload database artifact
+        uses: actions/upload-artifact@v4
         with:
-          debug: true
-          max-age: 5400  # 90 minutes
+          name: aircraft-database
+          path: data/aircraft.db
+          retention-days: 1
+
+  # Build each platform in parallel
+  build:
+    name: Build ${{ matrix.platform }}
+    needs: build-database
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm64
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download database artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: aircraft-database
+          path: data
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -69,26 +84,66 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=develop
-            type=sha,prefix=develop-
+      - name: Extract platform name for cache
+        id: platform
+        run: echo "name=$(echo ${{ matrix.platform }} | sed 's/\//-/g')" >> $GITHUB_OUTPUT
 
-      - name: Build and push
+      - name: Build and push by digest
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
-          tags: |
-            ${{ env.IMAGE_NAME }}:develop
-            ${{ env.IMAGE_NAME }}:develop-${{ github.sha }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=build-${{ steps.platform.outputs.name }}
+          cache-to: type=gha,mode=max,scope=build-${{ steps.platform.outputs.name }}
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ steps.platform.outputs.name }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # Merge all platform images into a single manifest
+  merge:
+    name: Create Multi-Platform Manifest
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          pattern: digests-*
+          path: /tmp/digests
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create \
+            --tag ${{ env.IMAGE_NAME }}:develop \
+            $(printf '${{ env.IMAGE_NAME }}@sha256:%s ' *)
+
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ env.IMAGE_NAME }}:develop
 
       - name: Trigger Portainer webhook (optional)
         continue-on-error: true
@@ -108,4 +163,4 @@ jobs:
           echo "| Branch | develop |" >> $GITHUB_STEP_SUMMARY
           echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Image | \`${{ env.IMAGE_NAME }}:develop\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Tagged | \`${{ env.IMAGE_NAME }}:develop-${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Platforms | linux/amd64, linux/arm64 |" >> $GITHUB_STEP_SUMMARY

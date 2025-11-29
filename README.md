@@ -115,6 +115,18 @@ services:
       - "8182:8080"
 ```
 
+## Documentation
+
+For comprehensive documentation, see the [GitHub Wiki](https://github.com/ryakel/tail-lookup/wiki):
+
+- **[Architecture Overview](https://github.com/ryakel/tail-lookup/wiki/Architecture-Overview)** - System design and data flow
+- **[Database Design](https://github.com/ryakel/tail-lookup/wiki/Database-Design)** - Schema, FAA data format, optimization
+- **[API Documentation](https://github.com/ryakel/tail-lookup/wiki/API-Documentation)** - Complete API reference with examples
+- **[Deployment Guide](https://github.com/ryakel/tail-lookup/wiki/Deployment-Guide)** - Docker, Kubernetes, cloud platforms
+- **[CI/CD Pipeline](https://github.com/ryakel/tail-lookup/wiki/CI-CD-Pipeline)** - Workflow documentation and secrets
+- **[Development Guide](https://github.com/ryakel/tail-lookup/wiki/Development-Guide)** - Local setup and contribution guidelines
+- **[Troubleshooting](https://github.com/ryakel/tail-lookup/wiki/Troubleshooting)** - Common issues and solutions
+
 ## Development
 
 ```bash
@@ -130,20 +142,7 @@ pip install -r requirements.txt
 DB_PATH=data/aircraft.db uvicorn app.main:app --reload --port 8080
 ```
 
-## CI/CD
-
-| Workflow | Trigger | Action |
-|----------|---------|--------|
-| `nightly-build.yml` | Daily 6 AM UTC | Fetch FAA data → Build DB → Push image |
-| `build.yml` | Code changes | Rebuild image with latest DB |
-
-### Required Secrets
-
-| Secret | Required | Description |
-|--------|----------|-------------|
-| `DOCKERHUB_USERNAME` | Yes | Docker Hub username |
-| `DOCKERHUB_TOKEN` | Yes | Docker Hub access token |
-| `PORTAINER_WEBHOOK_URL` | No | Auto-redeploy webhook |
+See the [Development Guide](https://github.com/ryakel/tail-lookup/wiki/Development-Guide) for complete setup instructions.
 
 ## Data Source
 

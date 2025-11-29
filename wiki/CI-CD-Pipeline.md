@@ -379,14 +379,14 @@ docker inspect ryakel/tail-lookup:latest | jq '.[0].Config.Labels'
 ### Multi-Architecture Support
 
 **Current**: Single architecture (amd64)
-**Planned**: Multi-platform builds (amd64, arm64, arm/v7)
+**Planned**: Multi-platform builds (amd64, arm64)
 
 To enable:
 ```yaml
 - name: Build and push
   uses: docker/build-push-action@v5
   with:
-    platforms: linux/amd64,linux/arm64,linux/arm/v7
+    platforms: linux/amd64,linux/arm64
     # ... rest of config
 ```
 
