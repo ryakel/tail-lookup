@@ -67,10 +67,19 @@ jobs:
           NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
           echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
 
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "$NEW_TAG" -m "Release $NEW_TAG"
-          git push origin "$NEW_TAG"
+          # Check if tag already exists
+          if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
+            echo "Tag $NEW_TAG already exists, skipping tag creation"
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+          else
+            # Create and push tag
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag -a "$NEW_TAG" -m "Release $NEW_TAG"
+            git push origin "$NEW_TAG"
+            echo "Created and pushed tag: $NEW_TAG"
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Build database for release
         run: |
@@ -103,6 +112,7 @@ jobs:
           } >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
+        if: steps.version.outputs.tag_exists != 'true'
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.version.outputs.new_tag }}
