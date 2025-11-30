@@ -27,7 +27,7 @@ jobs:
       new_tag: ${{ steps.version.outputs.new_tag }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -140,7 +140,7 @@ jobs:
     if: always()  # Run even if release is skipped (for PRs)
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download latest database from releases
         run: |
@@ -175,7 +175,7 @@ jobs:
           - linux/arm64
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download database artifact
         uses: actions/download-artifact@v4
