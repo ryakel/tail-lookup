@@ -55,12 +55,13 @@ body:
     id: deployment
     attributes:
       label: Deployment Method
-      description: How are you running Flight Budget Calculator?
+      description: How are you running tail-lookup?
       options:
-        - Browser (opened index.html directly)
         - Docker (local deployment)
+        - Docker Compose
         - Docker (Portainer)
         - Docker (other container platform)
+        - Python (local development)
         - Other
     validations:
       required: true
@@ -87,8 +88,8 @@ body:
     id: version
     attributes:
       label: Application Version
-      description: What version of Flight Budget Calculator? (Check footer or Docker tag)
-      placeholder: "Example: v1.2.3, latest, develop"
+      description: What version of tail-lookup? (Check Docker tag or git commit)
+      placeholder: "Example: latest, 2025-12-01, v1.2.3"
 
   - type: textarea
     id: console-errors
@@ -169,4 +170,4 @@ body:
         3. Once confirmed, it will be prioritized for fixing
         4. You'll be notified when a fix is released
 
-        **Want to help fix it?** Check our [Contributing Guide](https://github.com/ryakel/flight-budget/wiki/Contributing) to submit a pull request!
+        **Want to help fix it?** Check our [Development Guide](https://github.com/ryakel/tail-lookup/wiki/Development-Guide) to submit a pull request!

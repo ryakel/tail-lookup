@@ -1,5 +1,9 @@
 # tail-lookup
 
+[![Docker Pulls](https://img.shields.io/docker/pulls/ryakel/tail-lookup)](https://hub.docker.com/r/ryakel/tail-lookup)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub release](https://img.shields.io/github/v/release/ryakel/tail-lookup)](https://github.com/ryakel/tail-lookup/releases)
+
 Lightweight, self-hosted API for FAA aircraft registration lookup by N-number.
 
 Database baked into image—just pull and run.
@@ -150,7 +154,7 @@ Aircraft data from [FAA Releasable Aircraft Database](https://www.faa.gov/licens
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Credits
 

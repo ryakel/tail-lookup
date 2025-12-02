@@ -3,7 +3,7 @@
   "extends": [
     "config:base"
   ],
-  "description": "Renovate Bot configuration for Flight Budget Calculator - monitors dependencies.json and creates PRs for updates",
+  "description": "Renovate Bot configuration for tail-lookup - monitors Python dependencies and Docker images",
   "timezone": "UTC",
   "schedule": [
     "before 3am on Monday"
@@ -19,12 +19,12 @@
   "prHourlyLimit": 2,
   "packageRules": [
     {
-      "description": "CDN Libraries from dependencies.json",
-      "matchManagers": ["regex"],
-      "matchFileNames": ["dependencies.json"],
-      "labels": ["cdn-libraries"],
+      "description": "Python dependencies in requirements.txt",
+      "matchManagers": ["pip_requirements"],
+      "matchFileNames": ["requirements.txt"],
+      "labels": ["python"],
       "commitMessagePrefix": "chore(deps):",
-      "semanticCommitScope": "cdn"
+      "semanticCommitScope": "python"
     },
     {
       "description": "Docker base images",
@@ -37,38 +37,6 @@
       "matchManagers": ["github-actions"],
       "labels": ["github-actions"],
       "commitMessagePrefix": "ci:"
-    }
-  ],
-  "regexManagers": [
-    {
-      "description": "Update PapaParse version in dependencies.json",
-      "fileMatch": ["^dependencies\\.json$"],
-      "matchStrings": [
-        "\"papaparse\":\\s*{[^}]*\"version\":\\s*\"(?<currentValue>[^\"]+)\"[^}]*\"url\":\\s*\"(?<depName>https://cdnjs\\.cloudflare\\.com/ajax/libs/PapaParse)/\\{VERSION\\}/papaparse\\.min\\.js\""
-      ],
-      "datasourceTemplate": "npm",
-      "depNameTemplate": "papaparse",
-      "versioningTemplate": "semver"
-    },
-    {
-      "description": "Update Chart.js version in dependencies.json",
-      "fileMatch": ["^dependencies\\.json$"],
-      "matchStrings": [
-        "\"chartjs\":\\s*{[^}]*\"version\":\\s*\"(?<currentValue>[^\"]+)\"[^}]*\"url\":\\s*\"(?<depName>https://cdn\\.jsdelivr\\.net/npm/chart\\.js)@\\{VERSION\\}/dist/chart\\.umd\\.min\\.js\""
-      ],
-      "datasourceTemplate": "npm",
-      "depNameTemplate": "chart.js",
-      "versioningTemplate": "semver"
-    },
-    {
-      "description": "Update html2pdf.js version in dependencies.json",
-      "fileMatch": ["^dependencies\\.json$"],
-      "matchStrings": [
-        "\"html2pdf\":\\s*{[^}]*\"version\":\\s*\"(?<currentValue>[^\"]+)\"[^}]*\"url\":\\s*\"(?<depName>https://cdnjs\\.cloudflare\\.com/ajax/libs/html2pdf\\.js)/\\{VERSION\\}/html2pdf\\.bundle\\.min\\.js\""
-      ],
-      "datasourceTemplate": "npm",
-      "depNameTemplate": "html2pdf.js",
-      "versioningTemplate": "semver"
     }
   ]
 }
