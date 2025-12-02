@@ -97,19 +97,28 @@ EOF
 
 When the PR is merged to `main`:
 
-1. **Docker Build Workflow** (`build-main.yml`) runs:
+The **Main Branch Build Workflow** (`build-main.yml`) runs and performs the following:
+
+1. **Version Determination**:
+   - Analyzes commits since last tag
+   - Determines version bump (major/minor/patch) based on commit messages
+   - Creates new semantic version tag
+
+2. **Database Preparation**:
    - Builds database from FAA data or downloads from latest release
+
+3. **Docker Build and Publish**:
    - Builds multi-architecture images (amd64, arm64) in parallel
    - Pushes to Docker Hub with digest
    - Creates multi-platform manifest
-   - Tags with `latest` and date stamp
+   - Tags with `latest`, date stamp, and version number
 
-2. **Release Workflow** (`release.yml`) runs:
+4. **Release Creation**:
    - Analyzes commits since last release
    - Determines version bump (major/minor/patch)
    - Builds fresh database for statistics
    - Creates Git tag (e.g., `v1.2.3`)
-   - Extracts recent changes from `.claude/session-notes.md`
+   - Extracts recent changes from changelog
    - Creates GitHub Release with:
      - Release notes
      - Database statistics (record count, update date)
@@ -125,7 +134,7 @@ The release includes:
 - **Release notes** with:
   - Database information (records, last updated)
   - Quick start instructions
-  - Integration guide for flight-budget
+  - Integration guide for consuming applications
   - Recent changes
   - Docker pull commands
   - Full commit list
@@ -171,40 +180,25 @@ git commit -m "docs: Update API documentation"
 git commit -m "chore: Update dependencies"
 ```
 
-## Maintaining Session Notes
+## Maintaining the Changelog
 
-Keep `.claude/session-notes.md` up to date with all changes. The release workflow extracts recent content from this file for release notes.
+Keep the wiki's `Changelog.md` up to date with all changes. The release workflow uses this for generating release notes.
 
-### Session Notes Format
+### Changelog Format
+
+Document changes in the Changelog under the "Latest Changes" section with clear descriptions:
 
 ```markdown
-# tail-lookup Session Notes
+### Feature Name (YYYY-MM-DD)
+- **Key change**: Description of change
+- **Impact**: How it affects users/system
+- **Benefits**: What improvements this provides
 
-## Feature Name (Session YYYY-MM-DD)
-
-**Goal**: Brief description
-
-**Changes Made**:
-1. Change 1
-2. Change 2
-
-**Benefits**:
-- Benefit 1
-- Benefit 2
-
-**Testing Results**:
-- Test 1: ✅
-- Test 2: ✅
-
-## Bug Fix Name (Session YYYY-MM-DD)
-
-**Problem**: Description of issue
-
-**Root Cause**: Why it happened
-
-**Fix**: How it was resolved
-
-**Result**: Outcome after fix
+### Bug Fix Name (YYYY-MM-DD)
+- **Fixed**: Description of what was broken
+- **Root cause**: Why it happened
+- **Solution**: How it was resolved
+- **Result**: Improved behavior
 ```
 
 ## Docker Hub Integration
@@ -225,19 +219,19 @@ docker run -d -p 8080:8080 ryakel/tail-lookup:latest
 curl http://localhost:8080/api/v1/aircraft/N172SP
 ```
 
-## Integration with flight-budget
+## Integration with Other Applications
 
-After tail-lookup releases, update flight-budget deployment:
+After tail-lookup releases, consuming applications can update their deployment configurations:
 
 ```yaml
-# docker-compose.yml
+# docker-compose.yml example
 services:
   tail-lookup:
     image: ryakel/tail-lookup:latest  # or specific version
     # ... rest of config
 ```
 
-The flight-budget `build-main.yml` workflow automatically downloads the latest database from tail-lookup releases.
+Downstream application workflows can automatically download the latest database from tail-lookup releases for custom builds or validation.
 
 ## Nightly Builds
 
@@ -282,9 +276,10 @@ gh release create v1.2.3 \
 ### Release workflow didn't trigger
 
 **Check**:
-- Workflow file exists: `.github/workflows/release.yml`
+- Workflow file exists: `.github/workflows/build-main.yml`
 - Push was to `main` branch
-- Changes weren't only to ignored paths (`.github/**`, `wiki/**`, `*.md`)
+- Changes weren't only to ignored paths (documentation files, etc.)
+- Version step completed successfully
 
 ### Wrong version number generated
 
@@ -303,7 +298,7 @@ gh release create v1.2.3 \
 ### Release notes are incomplete
 
 **Fix**:
-- Update `.claude/session-notes.md` with missing information
+- Update `wiki/Changelog.md` with missing information
 - Create a new patch release with documentation updates
 
 ### Docker images not tagged correctly
@@ -340,20 +335,20 @@ docker pull ryakel/tail-lookup:2025-11-28
 
 ## Best Practices
 
-1. **Keep session notes updated** - Document changes as you develop
+1. **Keep changelog updated** - Document changes in wiki/Changelog.md as you develop
 2. **Use semantic commits** - Follow commit message conventions
 3. **Test database changes** - Verify FAA data parsing works correctly
 4. **Test before merging** - Ensure all API tests pass on develop
 5. **Review Docker builds** - Verify multi-arch images build successfully
 6. **Monitor releases** - Check GitHub releases and database stats
-7. **Coordinate with flight-budget** - Ensure compatibility maintained
+7. **Coordinate with consuming applications** - Ensure API compatibility maintained
 
 ## Related Documentation
 
-- [CI/CD Pipeline](CI-CD-Pipeline.md) - Build and deployment workflows
-- [Database Schema](Database-Schema.md) - FAA database structure
-- [API Documentation](API-Documentation.md) - REST API endpoints
-- [Integration Guide](https://github.com/ryakel/flight-budget/blob/main/infrastructure/examples/README.md) - flight-budget integration
+- [CI/CD Pipeline](CI-CD-Pipeline) - Build and deployment workflows
+- [Database Design](Database-Design) - FAA database structure and schema
+- [API Documentation](API-Documentation) - REST API endpoints
+- [Deployment Guide](Deployment-Guide) - Deployment and integration patterns
 
 ## Questions?
 

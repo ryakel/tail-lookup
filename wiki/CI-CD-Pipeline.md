@@ -4,12 +4,13 @@ Comprehensive documentation of the tail-lookup CI/CD workflows, automation, and 
 
 ## Overview
 
-Tail-lookup uses GitHub Actions for automated builds, testing, and deployment. The CI/CD pipeline consists of two main workflows:
+Tail-lookup uses GitHub Actions for automated builds, testing, and deployment. The CI/CD pipeline consists of three main workflows:
 
 1. **Nightly Build** - Daily automated database updates
-2. **Code Change Build** - Builds triggered by code changes
+2. **Main Branch Build** - Builds triggered by code changes to main, with versioning and releases
+3. **Develop Branch Build** - Builds triggered by code changes to develop branch
 
-Both workflows build Docker images and publish to Docker Hub with automatic versioning and tagging.
+All workflows build Docker images and publish to Docker Hub with appropriate tagging.
 
 ## Workflows
 
@@ -223,11 +224,12 @@ env:
 
 ---
 
-### 2. Code Change Build Workflow
+### 2. Main Branch Build Workflow
 
-**File**: `.github/workflows/build.yml`
-**Purpose**: Build and publish on code changes
+**File**: `.github/workflows/build-main.yml`
+**Purpose**: Build, version, and publish on code changes to main branch
 **Trigger**: Push to main or PR to main (for paths: `app/**`, `Dockerfile`, `requirements.txt`)
+**Note**: This workflow also handles semantic versioning and release creation
 
 #### Workflow Steps
 
@@ -334,14 +336,33 @@ This prevents unnecessary builds for non-code changes.
 
 ---
 
+### 3. Develop Branch Build Workflow
+
+**File**: `.github/workflows/build-develop.yml`
+**Purpose**: Build and publish on code changes to develop branch
+**Trigger**: Push to develop branch (for paths: `app/**`, `Dockerfile`, `requirements.txt`)
+
+This workflow is similar to the main branch build but:
+- Does NOT create releases or version tags
+- Tags images with `develop` and `develop-YYYY-MM-DD-SHA` tags
+- Used for testing before merging to main
+- No automatic version bumping
+
+---
+
 ## Docker Image Details
 
 ### Image Tags
 
 **latest**:
-- Always points to most recent build
-- Updated by both workflows
+- Always points to most recent main branch build
+- Updated by nightly and main branch workflows
 - Use for production deployments that want automatic updates
+
+**develop**:
+- Points to most recent develop branch build
+- Updated by develop branch workflow
+- Use for testing unreleased features
 
 **Date tags** (e.g., `2025-11-28`):
 - Created by nightly build
@@ -349,9 +370,14 @@ This prevents unnecessary builds for non-code changes.
 - Use for reproducible deployments
 
 **Date-SHA tags** (e.g., `2025-11-28-abc1234`):
-- Created by code change build
+- Created by main and develop branch builds
 - Tracks specific code version with date
 - Use for testing or rollback scenarios
+
+**Version tags** (e.g., `v1.2.3`):
+- Created by main branch build when creating releases
+- Follows semantic versioning
+- Use for pinning to specific release versions
 
 ### Image Labels
 
@@ -551,11 +577,6 @@ gh run view <run-id> --log
 - Clear intent in workflow definition
 
 ### Dependency Security
-
-**Dependabot** (coming from renovate.json):
-- Automatic dependency updates
-- Security vulnerability alerts
-- Pull requests for updates
 
 **Renovate**:
 - Configured in renovate.json

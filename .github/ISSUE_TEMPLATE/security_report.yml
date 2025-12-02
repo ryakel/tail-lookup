@@ -115,8 +115,9 @@ body:
       description: Which deployment methods are affected?
       multiple: true
       options:
-        - Browser (local HTML file)
         - Docker deployment
+        - Docker Compose
+        - Python (local development)
         - All deployment methods
         - Unknown
 
@@ -206,6 +207,6 @@ body:
 
         ### Questions?
 
-        Check our [SECURITY.md](https://github.com/ryakel/flight-budget/blob/main/SECURITY.md) for our security policy and contact information.
+        Check our [SECURITY.md](https://github.com/ryakel/tail-lookup/blob/main/SECURITY.md) for our security policy and contact information.
 
-        **Thank you for helping keep Flight Budget Calculator secure!** 🛡️
+        **Thank you for helping keep tail-lookup secure!** 🛡️

@@ -1,5 +1,5 @@
 name: Feature Request
-description: Suggest a new feature or enhancement for Flight Budget Calculator
+description: Suggest a new feature or enhancement for tail-lookup
 title: "[Feature]: "
 labels: ["enhancement", "needs-triage"]
 body:
@@ -55,10 +55,10 @@ body:
       label: User Type
       description: Which best describes you?
       options:
-        - Flight Student
-        - CFI/Flight Instructor
-        - Flight School Administrator
-        - Hobbyist Pilot
+        - Application Developer
+        - API Consumer
+        - Flight Application Developer
+        - System Administrator
         - Other
     validations:
       required: true
@@ -98,4 +98,4 @@ body:
         3. Popular requests are prioritized for development
         4. You'll be notified of any updates or questions
 
-        **Want to contribute?** Check our [Contributing Guide](https://github.com/ryakel/flight-budget/wiki/Contributing) to implement this feature yourself!
+        **Want to contribute?** Check our [Development Guide](https://github.com/ryakel/tail-lookup/wiki/Development-Guide) to implement this feature yourself!

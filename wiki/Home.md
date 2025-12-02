@@ -10,6 +10,7 @@ Welcome to the tail-lookup technical documentation. This wiki provides comprehen
 - [Deployment Guide](Deployment-Guide)
 - [CI/CD Pipeline](CI-CD-Pipeline)
 - [Development Guide](Development-Guide)
+- [Contributing](Contributing)
 - [Troubleshooting](Troubleshooting)
 
 ## Project Overview
@@ -83,9 +84,10 @@ See the [Development Guide](Development-Guide) for detailed setup instructions.
 
 ## Contributing
 
-This project follows standard GitHub workflows:
-- Issues and feature requests via GitHub Issues
-- Pull requests for contributions
-- Automated testing and building via GitHub Actions
+Want to contribute? Check out our [Contributing Guide](Contributing) for:
+- Development setup instructions
+- Code style guidelines
+- Pull request process
+- Commit message conventions
 
-See repository templates for issue and PR guidelines.
+For security issues, see our [Security Policy](../SECURITY.md).

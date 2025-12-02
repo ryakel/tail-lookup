@@ -237,9 +237,10 @@ CREATE INDEX idx_mfr_mdl_code ON master(mfr_mdl_code);
 
 See [CI/CD Pipeline](CI-CD-Pipeline) for detailed workflow documentation.
 
-**Two Workflows**:
+**Primary Workflows**:
 1. **Nightly Build** (`nightly-build.yml`): Daily at 6 AM UTC
-2. **Code Change Build** (`build.yml`): On push to main or PR
+2. **Main Branch Build** (`build-main.yml`): On push to main, handles versioning and releases
+3. **Develop Branch Build** (`build-develop.yml`): On push to develop branch
 
 **Design Decisions**:
 - **Why 6 AM UTC?** FAA updates at 11:30 PM CT (5:30 AM UTC), 30min buffer
@@ -296,8 +297,7 @@ See [CI/CD Pipeline](CI-CD-Pipeline) for detailed workflow documentation.
 
 - **GitHub Actions permissions**: Minimal permissions (contents:write, packages:write)
 - **Secrets management**: Docker Hub credentials stored as GitHub Secrets
-- **Dependabot**: Automated dependency updates
-- **Renovate**: Automated dependency updates with auto-merge
+- **Renovate**: Automated dependency updates with intelligent scheduling and auto-merge capabilities
 
 ## Future Considerations
 

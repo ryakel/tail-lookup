@@ -124,7 +124,7 @@ tail-lookup/
    - Test changes locally
 
 3. **Update documentation**:
-   - Update `.claude/changelog.md` with changes
+   - Update `wiki/Changelog.md` with changes
    - Update relevant wiki pages if needed
    - Update API docs in code (docstrings)
 
@@ -337,7 +337,7 @@ python scripts/update_faa_data.py data/aircraft.db
 
 4. **Update docs**:
    - Add to `wiki/API-Documentation.md`
-   - Update `.claude/changelog.md`
+   - Update `wiki/Changelog.md`
 
 ### Modify Database Schema
 
@@ -370,7 +370,7 @@ AIRCRAFT_TYPES = {
 1. **Fork repository** (for external contributors)
 2. **Create feature branch**
 3. **Make changes** with tests
-4. **Update documentation** (.claude/changelog.md, wiki pages)
+4. **Update documentation** (wiki/Changelog.md, other wiki pages)
 5. **Commit with descriptive message**
 6. **Push to your fork/branch**
 7. **Create Pull Request** with description
